@@ -33,7 +33,7 @@ func (r *Repository) Get(id int) ([]byte, error) {
 	bytes, ok := r.cache[id]
 	if !ok {
 		fmt.Println("ye")
-		err := r.pool.QueryRow(context.Background(), "SELECT model FROM wb_table WHERE id=$1", id).Scan(&bytes)
+		err := r.pool.QueryRow(context.Background(), "SELECT model FROM users WHERE id=$1", id).Scan(&bytes)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, common.ErrNotFound
 		}
