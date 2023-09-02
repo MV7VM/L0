@@ -48,3 +48,26 @@ func (r *Repository) Create(id int, msg []byte) error {
 	_, err := r.pool.Exec(context.Background(), "INSERT INTO users VALUES ($1,$2)", id, msg)
 	return err
 }
+
+func (r *Repository) CacheRecovery() error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	rows, err := r.pool.Query(context.Background(), "SELECT id, model FROM users")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id int
+		var b []byte
+		err := rows.Scan(&id, &b)
+		if err != nil {
+			continue
+		}
+		r.cache[id] = b
+	}
+	if err = rows.Err(); err != nil {
+		return err
+	}
+	return nil
+}
