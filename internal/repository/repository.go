@@ -46,6 +46,9 @@ func (r *Repository) Get(id int) ([]byte, error) {
 }
 func (r *Repository) Create(id int, msg []byte) error {
 	_, err := r.pool.Exec(context.Background(), "INSERT INTO users VALUES ($1,$2)", id, msg)
+	if err != nil {
+		r.cache[id] = msg
+	}
 	return err
 }
 
