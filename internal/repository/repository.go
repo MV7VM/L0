@@ -32,7 +32,7 @@ func (r *Repository) Get(id int) ([]byte, error) {
 	defer r.mu.RUnlock()
 	bytes, ok := r.cache[id]
 	if !ok {
-		fmt.Println("ye")
+		//fmt.Println("ye")
 		err := r.pool.QueryRow(context.Background(), "SELECT model_user FROM users WHERE id=$1", id).Scan(&bytes)
 		fmt.Println(bytes, err)
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -43,4 +43,8 @@ func (r *Repository) Get(id int) ([]byte, error) {
 		}
 	}
 	return bytes, nil
+}
+func (r *Repository) Create(id int, msg []byte) error {
+	_, err := r.pool.Exec(context.Background(), "INSERT INTO users VALUES ($1,$2)", id, msg)
+	return err
 }

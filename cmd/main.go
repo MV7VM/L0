@@ -4,6 +4,7 @@ import (
 	"L0/config"
 	"L0/internal/handlers"
 	"L0/internal/repository"
+	"L0/internal/service"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -11,12 +12,14 @@ type App struct {
 	handlers   *handlers.Handlers
 	repository *repository.Repository
 	routers    *fiber.App
+	service    *service.Service
 }
 
 func main() {
 	app := &App{}
 	cfg := config.Config_load()
 	app.repository = repository.New(cfg)
+	app.service = service.New(app.repository)
 	app.handlers = handlers.New(app.repository)
 	//database.ConnectDB(cfg)
 	app.routers = fiber.New()
