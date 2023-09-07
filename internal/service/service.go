@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/nats-io/stan.go"
+	"github.com/nats-io/nats.go"
 	//"github.com/nats-io/stan.go"
 )
 
@@ -27,23 +27,34 @@ func (s *Service) ConsumeMessage() error {
 		Count_id++
 		return Count_id
 	}
-	sc, _ := stan.Connect("test-cluster", "client-123", stan.NatsURL(stan.DefaultNatsURL))
-	defer sc.Close()
-	// Subscribe with durable name
-	sub, err := sc.Subscribe("foo", func(m *stan.Msg) {
-		fmt.Printf("Received a message: %s\n", string(m.Data))
-		err := Validate(m.Data)
-		if err == nil {
-			s.repository.Create(new_id(), m.Data)
-		}
-	}, stan.DurableName("my-durable"))
-	defer sub.Unsubscribe()
+	nc, err := nats.Connect(nats.DefaultURL)
+	//defer nc.Close()
 	if err != nil {
-		return err
+		fmt.Println("Cann't connect to nats: ", err)
 	}
+	// Simple Publisher
+	//nc.Publish("foo", []byte("Hello World"))
+
+	// Simple Async Subscriber
+	nc.Subscribe("foo", func(m *nats.Msg) {
+		//fmt.Println(123)
+		err = Validate(m.Data)
+		if err == nil {
+			id := new_id()
+			e := s.repository.Create(id, m.Data)
+			if e != nil {
+				fmt.Println("Cann't insert to table: ", err)
+			} else {
+				fmt.Printf("%d Received and insert a message: %s\n", id, string(m.Data))
+			}
+		} else {
+			fmt.Printf("Received but not validate a message: %s\n", string(m.Data))
+		}
+	})
 	return err
 }
 func Validate(data []byte) error {
+	fmt.Println("Val")
 	m := &model.Model{}
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.DisallowUnknownFields()

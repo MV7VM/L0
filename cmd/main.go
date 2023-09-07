@@ -5,6 +5,7 @@ import (
 	"L0/internal/handlers"
 	"L0/internal/repository"
 	"L0/internal/service"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -23,21 +24,19 @@ func main() {
 	app.handlers = handlers.New(app.repository)
 	//database.ConnectDB(cfg)
 	app.routers = fiber.New()
+	err := app.repository.CacheRecovery()
+	if err != nil {
+		fmt.Println("Cann't cache recovery: ", err)
+	}
 	go func() {
-		err := app.repository.CacheRecovery()
-		if err != nil {
-			return
-		}
-		for 1 == 1 {
-			err = app.service.ConsumeMessage()
-		}
+		_ = app.service.ConsumeMessage()
 	}()
 	app.routers.Get("/", func(c *fiber.Ctx) error {
 		err := c.SendString("And the API is UP!")
 		return err
 	})
 	app.routers.Get("/:Id", app.handlers.Get)
-	err := app.routers.Listen(":3000")
+	err = app.routers.Listen(":3000")
 	if err != nil {
 		return
 	}

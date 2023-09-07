@@ -55,7 +55,7 @@ func (r *Repository) Create(id int, msg []byte) error {
 func (r *Repository) CacheRecovery() error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	rows, err := r.pool.Query(context.Background(), "SELECT id, model FROM users")
+	rows, err := r.pool.Query(context.Background(), "SELECT id, model_user FROM users")
 	if err != nil {
 		return err
 	}

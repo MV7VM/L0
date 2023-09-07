@@ -1,2 +1,5 @@
 /.env
 /go.mod
+/cmd/publisher/publisher.go
+/cmd/publisher/go.mod
+/cmd/publisher/hole/model.json
