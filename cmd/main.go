@@ -2,6 +2,7 @@ package main
 
 import (
 	"L0/config"
+	"L0/database"
 	"L0/internal/handlers"
 	"L0/internal/repository"
 	"L0/internal/service"
@@ -22,7 +23,7 @@ func main() {
 	app.repository = repository.New(cfg)
 	app.service = service.New(app.repository)
 	app.handlers = handlers.New(app.repository)
-	//database.ConnectDB(cfg)
+	database.ConnectDB(cfg)
 	app.routers = fiber.New()
 	err := app.repository.CacheRecovery()
 	if err != nil {
