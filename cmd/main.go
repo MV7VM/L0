@@ -29,7 +29,10 @@ func main() {
 		fmt.Println("Cann't cache recovery: ", err)
 	}
 	go func() {
-		_ = app.service.ConsumeMessage()
+		err = app.service.ConsumeMessage()
+		if err != nil {
+			fmt.Println("Err in concume mess")
+		}
 	}()
 	app.routers.Get("/", func(c *fiber.Ctx) error {
 		err := c.SendString("And the API is UP!")
