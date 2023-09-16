@@ -22,7 +22,7 @@ type Config struct {
 // Config func to get env value
 func Config_load() Config {
 	var cfg Config
-	err := cleanenv.ReadConfig(".env", &cfg)
+	err := cleanenv.ReadConfig("/home/max/GolandProjects/L0/.env", &cfg)
 	if err != nil {
 		fmt.Print("Error loading .env file")
 	}

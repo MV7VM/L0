@@ -41,6 +41,7 @@ func (s *Service) ConsumeMessage() error {
 		err = Validate(m.Data)
 		if err == nil {
 			id := new_id()
+			fmt.Println(id)
 			e := s.repository.Create(id, m.Data)
 			if e != nil {
 				fmt.Println("Cann't insert to table: ", err)
